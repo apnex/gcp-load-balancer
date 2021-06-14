@@ -1,0 +1,39 @@
+kind: compute#urlMap
+name: map-apnex-io
+defaultService: https://www.googleapis.com/compute/v1/projects/labops/global/backendServices/svc-github
+hostRules:
+  - hosts:
+      - apnex.io
+    pathMatcher: path-matcher-1
+  - hosts:
+      - raw.apnex.io
+    pathMatcher: path-matcher-2
+pathMatchers:
+  - defaultService: https://www.googleapis.com/compute/v1/projects/labops/global/backendServices/svc-eval-path
+    name: path-matcher-1
+    routeRules:
+      - matchRules:
+          - headerMatches:
+              - headerName: User-Agent
+                prefixMatch: git
+            ignoreCase: true
+        priority: 0
+        routeAction:
+          urlRewrite:
+            hostRewrite: github.com
+            pathPrefixRewrite: /apnex
+        service: https://www.googleapis.com/compute/v1/projects/labops/global/backendServices/svc-github
+      - matchRules:
+          - fullPathMatch: /
+        priority: 1
+        routeAction:
+          urlRewrite:
+            hostRewrite: github.com
+            pathPrefixRewrite: /apnex
+        service: https://www.googleapis.com/compute/v1/projects/labops/global/backendServices/svc-github
+  - name: path-matcher-2
+    defaultRouteAction:
+      urlRewrite:
+        hostRewrite: raw.githubusercontent.com
+        pathPrefixRewrite: /apnex
+    defaultService: https://www.googleapis.com/compute/v1/projects/labops/global/backendServices/svc-github-raw

@@ -1,0 +1,40 @@
+exports.evalPath = (req, res) => {
+	let path = req.path.split('/').slice(1);
+	let repo = path.shift();
+	let newpath;
+	if(path.length > 0) {
+		newpath = 'https://raw.apnex.io/' + repo + '/master/' + path.join('/');
+	} else {
+		newpath = 'https://github.com/apnex/' + repo
+	}
+	res.redirect(newpath);
+};
+
+
+## Create new function
+gcloud functions deploy eval-path
+	--allow-unauthenticated
+	--runtime=nodejs14
+	--trigger-http
+	--memory=128
+	--source=evalPath
+	--entry-point=evalPath
+--region=australia-southeast1
+
+## Create Serverless NEG
+gcloud compute network-endpoint-groups create neg-eval-path
+	--cloud-function-name=eval-path
+	--network-endpoint-type=serverless
+--region=australia-southeast1
+
+## Create backend-service
+gcloud compute backend-services create svc-eval-path
+	--protocol=HTTPS
+	--port-name=http
+--global
+
+## Attach NEG to backend-service
+gcloud compute backend-services add-backend svc-eval-path
+	--network-endpoint-group=neg-eval-path
+	--network-endpoint-group-region=australia-southeast1
+--global
