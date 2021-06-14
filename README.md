@@ -1,5 +1,5 @@
 ## `gcp-load-balancer`
-A collection of useful scripts and CLI examples for the `google cloud` load-balancing platform
+A collection of useful scripts and CLI examples for the `google cloud` load-balancing platform  
 Clone repository and adjust parameters as required  
 
 ---
